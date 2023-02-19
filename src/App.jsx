@@ -1,34 +1,189 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import React, { useState } from 'react';
+import {
+  RecoilRoot,
+  useRecoilValue,
+  useSetRecoilState,
+  useRecoilState,
+  selector
+} from 'recoil';
+import { todoListState, todoListFilterState } from './atoms/atom.js'
+//////
+const TodoList = () => {
+  const todoList = useRecoilValue(filteredTodoListState)
+  
 
-function App() {
-  const [count, setCount] = useState(0)
+  return(
+    <>
+      <TodoListStats />
+      <TodoListFilters />
+      <TodoItemCreator />
+      {todoList.map((todoItem)=>(
+        <TodoItem key={todoItem.id} item={todoItem}/>
+      ))}
+    </>
+)}
+/////////
+const filteredTodoListState = selector({
+  key: 'filteredTodoListState',
+  get: ({get}) => {
+    const filter = get(todoListFilterState);
+    const list = get(todoListState);
 
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+    switch (filter) {
+      case 'Show Completed':
+        return list.filter((item) => item.isComplete);
+      case 'Show Uncompleted':
+        return list.filter((item) => !item.isComplete);
+      default:
+        return list;
+    }
+  },
+});
+////////
+const TodoListFilters = () => {
+
+  const [filter, setFilter] = useRecoilState(todoListFilterState);
+
+  const updateFilter = ({target: {value}}) => {
+    setFilter(value)
+  }
+
+  return(
+    <>
+      filter:
+      <select value={filter} onChange={updateFilter}>
+        <option value="Show All">All</option>
+        <option value="Show Completed">Completed</option>
+        <option value="Show Uncompleted">Uncompleted</option>
+      </select>
+    </>
   )
 }
+////////
+const todoListStatsState = selector({
+  key: 'todoListStatsState',
+  get: ({get}) => {
+    const todoList = get(todoListState);
+    const totalNum = todoList.length;
+    const totalCompletedNum = todoList.filter((item) => item.isComplete).length;
+    const totalUncompletedNum = totalNum - totalCompletedNum;
+    const percentCompleted = totalNum === 0 ? 0 : totalCompletedNum / totalNum;
 
+    return {
+      totalNum,
+      totalCompletedNum,
+      totalUncompletedNum,
+      percentCompleted,
+    };
+  },
+});
+////////
+function TodoListStats() {
+  const {
+    totalNum,
+    totalCompletedNum,
+    totalUncompletedNum,
+    percentCompleted,
+  } = useRecoilValue(todoListStatsState);
+
+  const formattedPercentCompleted = Math.round(percentCompleted * 100);
+
+  return (
+    <ul>
+      <li>Total items: {totalNum}</li>
+      <li>Items completed: {totalCompletedNum}</li>
+      <li>Items not completed: {totalUncompletedNum}</li>
+      <li>Percent completed: {formattedPercentCompleted}</li>
+    </ul>
+  );
+}
+////////
+const TodoItem = ({item}) => {
+  const [todoList, setTodoList] = useRecoilState(todoListState)
+  const index = todoList.findIndex((listItem) => listItem === item)
+  console.log(todoList)
+  const editItemText = ({target: {value}}) => {
+    const newList = replaceItemAtIndex(todoList, index, {
+      ...item,
+      text: value,
+    })
+    setTodoList(newList)
+  }
+
+  const toggleItemCompleation = () =>{
+    const newList = replaceItemAtIndex(todoList, index, {
+      ...item,
+      isComplete: !item.isComplete,
+    })
+    setTodoList(newList);
+  }
+
+  const deleteItem = () => {
+    const newList = removeItemAtIndex(todoList, index);
+    setTodoList(newList);
+  }
+
+  return(
+    <div>
+      <input type="text" value={item.text} onChange={editItemText}/>
+      <input
+        type="checkbox"
+        checked={item.isComplete}
+        onChange={toggleItemCompleation}
+      />
+      <button onClick={deleteItem}>X</button>
+    </div>
+  )
+};
+//////////
+const replaceItemAtIndex = (arr,index,newValue) => {
+  return [...arr.slice(0, index), newValue, ...arr.slice(index + 1)]
+}
+///////////
+function removeItemAtIndex(arr, index) {
+  console.log(arr)
+  console.log(...arr.slice(0, index))
+  console.log(...arr.slice(index + 1))
+  return [...arr.slice(0, index), ...arr.slice(index + 1)];
+}
+//////////
+const TodoItemCreator = () => {
+
+  const [inputValue, setInputValue] = useState();
+  const setTodoList = useSetRecoilState(todoListState);
+
+  const addItem = () => {
+    setTodoList((oldTodoList) => [
+      ...oldTodoList,
+      {
+        id: getId(),
+        text: inputValue,
+        isComplete: false,
+      },
+    ]);
+    setInputValue('');
+  }
+
+  return  (
+    <div>
+      <input type='text' value={inputValue} onChange={e=>{
+        setInputValue(e.target.value);
+      }} />
+      <button onClick={addItem}>add</button>
+    </div>
+  );
+}
+/////////////
+let id = 0;
+function getId() {
+  return id++;
+}
+////////////
+function App() {
+  return (
+    <RecoilRoot>
+      <TodoList />
+    </RecoilRoot>
+  );
+}
 export default App

@@ -1,0 +1,25 @@
+recoil은 가장 기본적인 상태 값을 atom 형태로 저장한다.   // react에 있는 state값 같다.
+
+useRecoilValue는 recoil에서 제공하는 훅인데 useRecoilValue(atom) 형태로 사용된다.
+atom에 저장된 값을 확인할 수 있는 훅이다. 읽기만 가능하다  // react에 비유하면 console.log(state)같다. 
+
+useRecoilState는 recoil에서 제공하는 훅인데 const [count, setCount] = useRecoilState(countState);
+이러한 형태로 사용된다. 값을 읽고 쓸수 있도록 제공한다.  // 일반적으로 값을 읽고 쓰는게 모두 필요한 경우
+
+useSetRecoilState는 recoil에서 제공하는 훅인데 const setCount = useSetRecoilState(countState);
+이러한 형태로 사용된다. 값을 읽지 않고 쓸 수 있도록 해준다. // 현재 값을 읽지 않고 값만 업데이트 해야할 경우 필요하다.'
+
+selector은 atom의 값을 변환하고 결합하여 사용할 수 있는데 간단하게 풀어 말해서 
+selector이 가져다 쓴 atom의 값은 변하지 않고 새로운 형태의 값을 반환한다.
+위에 있는 두 훅과의 차이점은 atom의 값이 변하고 변하지 않는 것이 차이점이다.
+사용 방법은 
+export const multipliedCountState = selector({
+  key: 'multipliedCountState',
+  get: ({ get }) => {
+    const count = get(countState);
+    const multiplier = get(multiplierState);
+    return count * multiplier;
+  },
+});
+이러한 형태이다.
+key는 고유 식별자이고 get은 atom값을 가져올 수 있는 함수이다. 
