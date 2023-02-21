@@ -30,7 +30,7 @@ const Weather = () => {
               setNum(num+1)
               }}>
 
-              데이터 추가sdsadsdasdsad
+              데이터 추가
              </button>
          </div>
     );
