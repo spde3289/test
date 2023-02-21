@@ -8,4 +8,4 @@ export const todoListState = atom({
 export const todoListFilterState = atom({
     key: 'todoListFilterState',
     default: 'Show All',
-  });
+});

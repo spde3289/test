@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import {
   RecoilRoot,
   useRecoilValue,
@@ -7,11 +8,12 @@ import {
   selector
 } from 'recoil';
 import { todoListState, todoListFilterState } from './atoms/atom.js'
+import Weather from './query.jsx';
 //////
 const TodoList = () => {
+
   const todoList = useRecoilValue(filteredTodoListState)
   
-
   return(
     <>
       <TodoListStats />
@@ -166,9 +168,9 @@ const TodoItemCreator = () => {
 
   return  (
     <div>
-      <input type='text' value={inputValue} onChange={e=>{
+      <input type='text' value={inputValue || ""} onChange={(e)=>{
         setInputValue(e.target.value);
-      }} />
+      }}/>
       <button onClick={addItem}>add</button>
     </div>
   );
@@ -179,11 +181,25 @@ function getId() {
   return id++;
 }
 ////////////
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 300000, // 5 분마다 데이터를 다시 가져옴
+      refetchOnWindowFocus: false, /// 사용자가 창에 초점을 맞출때 데이터를 가져오지 않음
+    },
+  },
+});
+
 function App() {
+  console.log(queryClient);
   return (
-    <RecoilRoot>
-      <TodoList />
-    </RecoilRoot>
+    <QueryClientProvider client={queryClient}>
+      <RecoilRoot>
+        <Weather/>
+        <TodoList/>
+      </RecoilRoot>
+    </QueryClientProvider>
   );
 }
 export default App
