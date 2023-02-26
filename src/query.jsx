@@ -3,6 +3,8 @@ import axios from 'axios';
 
 import { useQuery } from 'react-query';
 
+import BookmarkIcon from './asd'
+
 
 const Weather = () => {
 
@@ -57,6 +59,7 @@ const Weather = () => {
  
        return (
          <div>
+          <BookmarkIcon/>
             <button onClick={()=>{
               setall(!all)
               }}>all </button>
