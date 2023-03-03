@@ -7,6 +7,7 @@ import {
   useRecoilState,
   selector
 } from 'recoil';
+import { Routes, Route } from 'react-router-dom';
 import { todoListState, todoListFilterState } from './atoms/atom.js'
 import Weather from './query.jsx';
 //////
@@ -196,8 +197,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <RecoilRoot>
-        <Weather/>
-        <TodoList/>
+        <Routes>
+          <Route path='/' element={<Weather/>}></Route>
+          <Route path='/Todo' element={<TodoList/>}></Route>
+        </Routes>
+
       </RecoilRoot>
     </QueryClientProvider>
   );
