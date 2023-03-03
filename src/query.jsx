@@ -3,13 +3,16 @@ import axios from 'axios';
 
 import { useQuery } from 'react-query';
 
+import BookmarkIcon from './asd'
+
+import { Link } from 'react-router-dom';
+
 
 const Weather = () => {
 
-  const [num,setNum] = useState(1)
   async function getUser() {
     try {
-        const response = await axios.get('https://jsonplaceholder.typicode.com/photos?albumId='+num);
+        const response = await axios.get('');
 
         return response.data
     } catch (error) {
@@ -17,8 +20,7 @@ const Weather = () => {
     };
 };
 
-
-  const { isLoading, error, isFetching, isFetched, data } = useQuery(['repoData',num], getUser,
+  const { isLoading, error, isFetching, isFetched, data } = useQuery(['repoData'], getUser,
   {
     keepPreviousData: true, // enable to keep the previous data
   }
@@ -54,9 +56,16 @@ const Weather = () => {
       const xx = newQuos.filter(item=> item.title.includes('quos'))
       setPostdata(xx)
     }
- 
+    const id = 123; // or use some other value to identify the content
        return (
          <div>
+            
+        
+            <Link to={`/modal/${1}`}>Open Modal</Link>
+            <Link to={`/modal/${2}`}>Open Modal</Link>
+            <Link to={`/modal/${3}`}>Open Modal</Link>
+    
+          <BookmarkIcon/>
             <button onClick={()=>{
               setall(!all)
               }}>all </button>

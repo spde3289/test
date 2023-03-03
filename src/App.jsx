@@ -10,6 +10,7 @@ import {
 import { Routes, Route } from 'react-router-dom';
 import { todoListState, todoListFilterState } from './atoms/atom.js'
 import Weather from './query.jsx';
+import MyModal from './MyModal.jsx';
 //////
 const TodoList = () => {
 
@@ -200,6 +201,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Weather/>}></Route>
           <Route path='/Todo' element={<TodoList/>}></Route>
+          <Route path="/modal/:id" element={<MyModal/>} />
         </Routes>
 
       </RecoilRoot>
